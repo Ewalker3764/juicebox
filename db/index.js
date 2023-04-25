@@ -75,6 +75,20 @@ async function getUserById(userId) {
   }
 }
 
+async function getUserByUsername(username) {
+  try {
+    const { rows: [user] } = await client.query(`
+      SELECT *
+      FROM users
+      WHERE username=$1;
+    `, [username]);
+
+    return user;
+  } catch (error) {
+    throw error;
+  }
+}
+
 /* POST Methods */
 
 async function createPost({
@@ -90,7 +104,9 @@ async function createPost({
       RETURNING *;
     `, [authorId, title, content]);
 
-    return post;
+    const tagList = await createTags(tags);
+
+    return await addTagsToPost(post.id, tagList);
   } catch (error) {
     throw error;
   }
@@ -189,7 +205,8 @@ async function createTags(tagList) {
   try {
     await client.query(`
     INSERT INTO tags(name)
-    VALUES ${insertValues};
+    VALUES ${insertValues}
+    ON CONFLICT (name) DO NOTHING;
     `, tagList)
 
     const { rows } = await client.query(`
@@ -274,6 +291,19 @@ async function getPostsByTagName(tagName) {
   }
 }
 
+async function getAlltags() {
+  try {
+    const { rows } = await client.query(`
+      SELECT *
+      FROM tags;
+    `);
+
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+}
+
 module.exports = {  
   client,
   createUser,
@@ -288,5 +318,7 @@ module.exports = {
   createPostTag,
   addTagsToPost,
   getPostById,
-  getPostsByTagName
+  getPostsByTagName,
+  getAlltags,
+  getUserByUsername
 }

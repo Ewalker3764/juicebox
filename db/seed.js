@@ -165,6 +165,7 @@ async function rebuildDB() {
     await dropTables();
     await createTables();
     await createInitialUsers();
+    
     await createInitialPosts();
   } catch (error) {
     console.log("Error during rebuildDB")
@@ -194,9 +195,10 @@ async function testDB() {
     /*console.log("Calling updatePost on posts[0]");
     const updatePostResult = await updatePost(posts[0].id, {
       title: "New Title",
-      content: "Updated Content"
+      content: "Updated Content" 
     });
     console.log("Result:", updatePostResult);*/
+
     console.log("Calling updatePost on posts[1], only updating tags");
     const updatePostTagsResult = await updatePost(posts[1].id, {
       tags: ["#youcandoanything", "#redfish", "#bluefish"]
